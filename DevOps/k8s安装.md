@@ -1,8 +1,8 @@
 # 安装k8s 1.28.1
 
-### 准备虚拟机 - 准备3台 centos7u9
+# 准备虚拟机 - 准备3台 centos7u9
 
-工具：vmware 17 player
+工具：vmware 17 player(免费版)
 
 iso：contos7u9(清华源下载)
 
@@ -36,11 +36,11 @@ node2 对应 192.168.198.162
 ### 设置ip地址对应主机名
 编辑/etc/hosts文件
 
-> 192.168.198.129 k8s-master
+> 192.168.198.160 k8s-master
 > 
-> 192.168.198.130 k8s-node0
+> 192.168.198.161 k8s-node1
 > 
-> 192.168.198.131 k8s-node1
+> 192.168.198.162 k8s-node2
 
 ### 关闭防火墙
 
@@ -155,3 +155,32 @@ EOF
 
 注释掉 swap 配置
 > #/dev/mapper/centos-swap swap                    swap    defaults        0 0
+
+# 安装containerd 
+
+从github上复制containerd下载链接 https://github.com/containerd/containerd/releases/tag/v1.7.5
+
+安装wget
+> yum install wget
+
+下载tar.gz()
+> wget https://github.com/containerd/containerd/releases/download/v1.7.5/cri-containerd-1.7.5-linux-amd64.tar.gz
+
+注：巨慢无比国内，试了很多种方法，只有配置hosts文件稍微有点用
+用windows CMD 命令 nslookup 查看
+github.com github.global.ssl.fastly.net assets-cdn.github.com  
+的ip地址，并添加到centos 的hosts文件中 目录为 /etc/hosts
+
+如果有台机器下好了，可以通过xftp软件直接复制到其他机器上
+
+
+![img.png](../resource/img.png)
+
+> 20.205.243.166 github.com  
+108.160.162.102 github.global.ssl.fastly.net  
+185.199.111.153 assets-cdn.github.com  
+
+
+下载完解压tar
+> tar xf cri-containerd-1.7.5-linux-amd64.tar.gz -C /
+
