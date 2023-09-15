@@ -68,14 +68,17 @@ node2 对应 192.168.198.162
 
 ### 时间同步
 
-查看定时任务
+安装ntpdate
+> yum install -y ntpdate
 
+查看定时任务
 > crontab -l
+
 
 编辑定时任务
 > crontab -e
 
-追加 每小时同步一次的定时任务
+追加 每小时同步一次的定时任务(安装ntpdate)
 > 0 */1 * * * ntpdate time1.aliyun.com
 
 ### 升级内核
@@ -130,7 +133,7 @@ EOF
 > yum install ipset ipvsadm
 
 添加配置文件
-cat > /etc/sysconfig/modules/ipvs.modules <<EOF  
+> cat > /etc/sysconfig/modules/ipvs.modules <<EOF  
 #!/bin/bash  
 modprobe -- ip_vs
 modprobe -- ip_vs_rr  
@@ -180,6 +183,7 @@ github.com github.global.ssl.fastly.net assets-cdn.github.com
 108.160.162.102 github.global.ssl.fastly.net  
 185.199.111.153 assets-cdn.github.com  
 
+追加：（找到好方法了，用github镜像网站加速下载文件然后传到linux上）
 
 下载完解压tar
 > tar xf cri-containerd-1.7.5-linux-amd64.tar.gz -C /
@@ -187,7 +191,7 @@ github.com github.global.ssl.fastly.net assets-cdn.github.com
 
 添加配置文件
 > mkdir /etc/containerd  
-> containerd config default /etc/containerd/config.toml
+> containerd config default > /etc/containerd/config.toml
 
 修改配置文件
 > vi /etc/containerd/config.toml  
@@ -222,6 +226,7 @@ github.com github.global.ssl.fastly.net assets-cdn.github.com
 > yum -y install gperf
 
 配置，编译，安装
+> cd libseccomp-2.5.4  
 > ./configure  
 > make  
 > make install 
@@ -239,9 +244,9 @@ github.com github.global.ssl.fastly.net assets-cdn.github.com
 > which runc
 
 删除runc
-> rm -rf `which runc`
+> rm -rf \`which runc\`
 
-顶级折磨之下载runc(只有10M大小浪费了偶40分钟，github到底怎么加速啊，已使用hosts配置和watt tools软件加速)
+顶级折磨之下载runc(只有10M大小浪费了偶40分钟，github到底怎么加速啊，已使用hosts配置和watt tools软件加速)（找到好方法了，用github镜像网站加速下载文件然后传到linux上）
 > wget https://github.com/opencontainers/runc/releases/download/v1.1.9/runc.amd64
 
 添加下载好的runc的运行权限
@@ -320,13 +325,15 @@ k8s初始化失败后重置
 注：掉进两个坑，
 1. 镜像拉不下来
 2. apiserver-advertise-address的地址填错
+3. cpu核心数量为1（至少为2）
 
 解决方法：
 1. 使用阿里云镜像 --image-repository registry.aliyuncs.com/google_containers
 2. 地址填错很难排查
    1. 通过kubeadm init报错提示查看 kubelet状态 <b>systemctl status kubelet</b> 正在运行没有问题
    2. 查看kubelet运行日志 <b>journalctl -exu kubelet</b> 日志一整行看不到头，我将日志复制出我的记事本上来看，其中Unable to register node with API server" err="Post \"https://192.168.198.0:6443/api/v1/nodes\": dial tcp 192.168.198.0:6 这种错误出现很多次，于是我怀疑是apiserver的地址搞错了，然后一看果然搞错了，然后改了地址，重试（kubeadm reset）一次，成功了！！！，摆酒席庆祝！！！哦豁（扭腰，扭屁股）
-   
+3. vmwara 进入虚拟机设置修改核心数为2
+
 查看kubelet状态
 > systemctl status kubelet
 
@@ -372,20 +379,49 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 ### 安装calico网络插件
 
-下载这玩意
-> wget https://docs.tigera.io/archive/v3.25/manifests/calico.yaml
+来这 https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart   
+下载这两玩意(tigera-operator.yaml , custom-resources.yaml) 通过github镜像加速网站下载，然后xftp上传到linux用户目录下
+![img.png](../resource/img1.png)
 
-修改calico.yaml
-> vi calico.yaml
+然后安装
+> kubectl create -f tigera-operator.yaml
 
-将以下注释去除并修改192.168.0.0为10.244.0.0  在4601行  
-#- name: CALICO_IPV4POOL_CIDR  
-#value: "192.168.0.0/16"
+查看命名空间
+> kubectl get ns
+![img.png](img.png)
 
-启用calico
-> kubectl apply -f calico.yaml
+查看tigara-operator内pod是否运行
+> kubectl get pods -n tigera-operator
 
-查看分配ip
-> kubectl get pods -n kube-system -o wide
+修改custom-resources.yaml
+> vi custom-resources.yaml  
+> 将192.168.0.0 改为 10.244.0.0
 
-测试：ping一下 coredns ip地址是否通信
+加载
+> kubectl create -f custom-resources.yaml
+
+### 测试是否通信
+获取CLUSTER-IP
+> kubectl get svc -n kube-system
+
+测试
+> dig -t a www.baidu.com @CLUSTER-IP
+
+安装nginx测试
+[nginx.yaml](../resource/nginx.yaml)
+
+> kubectl apply -f nginx.yaml
+
+获取CLUSTER-IP
+> kubectl get svc
+
+测试
+> curl http://CLUSTER-IP
+
+获取CLUSTER-IP
+> kubectl get pods -o wide
+
+测试 
+> curl http://CLUSTER-IP
+
+# 通了 == 撒花完结，不通自己去找办法解决哦，我成了，嘿嘿!!!(扭腰，扭屁股，siu!!!)
