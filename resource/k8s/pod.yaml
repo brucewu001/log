@@ -1,0 +1,82 @@
+apiVersion: v1 # api 文档版本 目前为v1
+kind: Pod # 资源对象类型，例如：Pod、Deployment、StatefulSet 这一类对象等
+metadata: # 用于描述资源对象的元数据
+  name: nginx-demo # 名称
+  labels: # 给资源加标签
+    type: app # 自定义的标签键和值
+    version: 1.0.0 # 标签可以多个
+  nameSpace: 'default' # 命名空间，不填就是default
+spec: # 资源规格 资源的各种规格，是期望达到这规格的一些规定
+  terminationGracePeriodSeconds: 40 # pod 删除停留时间默认30秒，这期间状态为terminating
+  containers: # 对应 容器的一些规定
+    - name: nginx # 容器名称
+      image: nginx:1.7.9 # 容器所需要的镜像和版本（需要仓库里面有）
+      imagePullPolicy: IfNotPresent # 拉取策略 镜像拉取策略。"Always"、"Never"、"IfNotPresent" 之一。如果不指定策略并且image指定了 :latest 标签，则默认为 "Always"， 否则默认为 "IfNotPresent"。
+      command: # 指定容器启动后命令 启动后会执行命令 nginx -g 'daemon off;'
+        - nginx
+        - -g
+        - 'daemon off;'
+      workingDir: /usr/share/nginx/html # 定义容器的工作目录，进入容器会进到这个目录下
+      lifecycle: # 生命周期配置
+        postStart: # 启动钩子，这个回调在容器被创建之后立即被执行。 但是，不能保证回调会在容器入口点（ENTRYPOINT）之前执行。
+          exec:
+            command: ["/bin/sh", "-c", "echo 'Hello from the postStart handler' > /usr/share/message"]
+        preStop: # 结束钩子
+          exec:
+            command: ["/bin/sh","-c","sleep 50"]
+      startupProbe: # 启动探针 监控应用是否启动优先级高于livenessProbe、readinessProbe
+#        httpGet: # 使用 httpGet 方式返回 200-400 就算成功 还有 tcpSocket、command 方式
+#          path: /api/path # 应用 http 请求路径
+#          port: 80 # 端口
+#          scheme: HTTP # 协议
+
+#        tcpSocket: # 使用 tcpSocket 方式
+#          port: 80
+        exec:
+          command:
+            - sh
+            - -c
+            - "echo success > /inited"
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+#      readinessProbe: # 就绪探针，应用启动完成到初始化完成
+#        failureThreshold: 3
+#        httpGet:
+#          path: /ready
+#          port: 8181
+#          scheme: HTTP
+#        periodSeconds: 10
+#        successThreshold: 1
+#        timeoutSeconds: 1
+
+#      livenessProbe: # 存活态探针 监控应用是否已GG，应用启动后（就是心跳装置）
+#        failureThreshold: 5 # 失败次数
+#        httpGet: # 使用 httpGet 方式返回 200-400 就算成功 还有 tcpSocket、command 方式
+#          path: /health # 应用 http 请求路径
+#          port: 8080 # 端口
+#          scheme: HTTP # 协议
+#        initialDelaySeconds: 60 # 容器启动后启动存活态探针之前的秒数。
+#        periodSeconds: 10 # 探针的执行周期（以秒为单位）。默认为 10 秒。最小值为 1
+#        successThreshold: 1 # 探针失败后最小连续成功次数，超过此阈值才会被视为探针成功。默认为 1。 存活性探针和启动探针必须为 1。最小值为 1。
+#        timeoutSeconds: 5 # 探针超时的秒数。默认为 1 秒。最小值为 1。
+
+
+
+      ports:
+        - name: http # 端口也可以取名称，你就说神不神奇吧
+          containerPort: 80 # 容器内指定端口
+          protocol: TCP # TCP 或者 UDP
+      env: # 环境变量
+        - name: JVM_OPTS
+          value: '-Xms128m -Xmx128m'
+      resources: # 如其名
+        requests: # 规定硬件资源的使用最小值
+          cpu: 0.01 # 使用 cpu 百分之一的资源
+          memory: 128Mi # 限制内存最少使用128m
+        limits: # 最大使用硬件资源
+          cpu: 0.2 # cpu 十分之二的能力
+          memory: 256Mi # 最多就给你256m 不够你就自己抛异常
+  restartPolicy: OnFailure # 重启策略 Pod 内所有容器的重启策略。Always、OnFailure、Never 之一。 在某些情况下，可能只允许这些值的一个子集。默认为 Always。

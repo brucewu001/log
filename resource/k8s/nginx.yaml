@@ -32,4 +32,3 @@ spec:
         ports:
         - containerPort: 80
           name: web
-

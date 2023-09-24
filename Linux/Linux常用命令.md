@@ -40,3 +40,7 @@
 域名解析(安装dig)
 > yum -y install bind-utils  
 > dig
+
+### 命令耗时
+> time 命令  
+> 例如： time kubectl delete po nginx-demo

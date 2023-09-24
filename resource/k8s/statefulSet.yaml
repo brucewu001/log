@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  clusterIP: None
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      name: web
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name:
+spec:
+  serviceName: "nginx" # 使用哪个 service 来管理 dns
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  updateStrategy:
+    rollingUpdate:
+      partition: 3 # 灰度更新 即先更新 >=3 的web没有问题后继续更新后续pod
+    type: RollingUpdate
+#    type: OnDelete # OnDelete 删除pod时并重建pod时才更新
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.7.9
+          ports:
+            - containerPort: 80
+              name: web
+

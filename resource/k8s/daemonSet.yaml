@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd
+spec:
+  selector:
+    matchLabels:
+      app: logging
+  template:
+    metadata:
+      labels:
+        app: logging
+        ip: fluentd
+      name: fluentd
+    spec:
+      nodeSelector: # 节点选择器，当node节点下有以下标签将创建 daemonSet pod
+        type: microservices
+      updateStrategy:
+        type: OnDelete # 建议改成 OnDelete 模式，一般这种pod会很多，一修改就需要大量的重启，所以建议使用 OnDelete
+      containers:
+        - name: fluentd
+          image: agilestacks/fluentd-elasticsearch:v1.3.0
+          env: #环境变量
+            - name: FLUENTD_ARGS
+              value: -qq
+          volumeMounts: # 加载数据卷，避免数据丢失
+            - name: varlog # 数据卷名称
+              mountPath: /var/log # 将数据卷挂载到容器内的目录
+            - name: containers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+      volumes:
+        - name: varlog # 数据卷名称
+          hostPath: # 主机路径模式，即和 node 共享目录
+            path: /var/log # 共享目录路径
+        - name: containers
+          hostPath:
+            path: /var/lib/docker/containers

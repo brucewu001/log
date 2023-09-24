@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-outdoor
+  name: nginx-outdoor
+  namespace: default
+spec:
+  replicas: 3
+  revisionHistoryLimit: 10 # 修改保留的版本数量，现在设置为10。即保留最近10个版本
+  selector: # 选择器，deployment 需要绑定资源
+    matchLabels: # 使用标签的形式绑定
+      app: nginx-outdoor # 绑定带有 app=nginx-out 标签的资源
+  strategy: # 更新策略
+    rollingUpdate: # 滚动更新策略详情
+      maxSurge: 25% # 是一个可选字段，用来指定 更新过程中不可用的 Pod 的个数上限。可以是比例也可以是绝对值。
+      maxUnavailable: 25% # 是一个可选字段，用来指定可以创建的超出期望 Pod 个数的 Pod 数量。可以是比例也可以是绝对值。
+    type: RollingUpdate # 策略类型为滚动更新
+  template: # 是一个 Pod 模板。 它和 Pod 的语法规则完全相同。 只是这里它是嵌套的，因此不需要 apiVersion 或 kind。
+    metadata:
+      labels:
+        app: nginx-outdoor
+    spec:
+      containers:
+        - image: nginx:1.7.9
+          imagePullPolicy: Always
+          name: nginx
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
