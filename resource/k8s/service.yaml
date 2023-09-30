@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service # 类型为Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  type: NodePort # 随机启动一个端口（30000 - 32767），暴露给外网，这个端口绑定在node上，即所有node的ip都可以访问这个端口，实际生产不建议这样暴露端口，效率低，四层负载不能解析http
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80 # 目标pod端口
+      name: web
+
+#  type: ExternalName # 外部域名类型，访问外部域名
+#  externalName: www.baidu.com # 对应的域名

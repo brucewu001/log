@@ -44,3 +44,9 @@
 ### 命令耗时
 > time 命令  
 > 例如： time kubectl delete po nginx-demo
+
+### 请求死循环
+> while true; do curl <ip>; done
+
+### 添加执行权限
+> sudo chmod +x /etc/sysconfig/startup.sh

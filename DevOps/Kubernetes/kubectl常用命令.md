@@ -95,7 +95,7 @@ master节点下admin.conf记录了最高权限的用户账号，复制到其他�
 恢复
 > kubectl rollout resume deployment/资源名 
 
-替换
+### 替换
 > kubectl replace -f xxx.yaml
 
 ### 查看所有资源
@@ -112,3 +112,23 @@ master节点下admin.conf记录了最高权限的用户账号，复制到其他�
 
 ### 删除statefulset默认级联删除，即sts和pod一起删除，若想非级联删除添加选项 --cascade=false
 > kubectl delete web sts --cascade=orphan
+
+### 自动扩容缩容
+> kubectl autoscale deploy nginx-outdoor --cpu-percent=20 --min=2 --max=5
+
+### metrics安装
+下载metrics
+> https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml  
+
+修改yaml
+![img.png](../../resource/k8s/img2.png)
+
+> \- --kubelet-insecure-tls # 加上该启动参数 (单独的-打不出了加了\就变这样)  
+> image: registry.cn-hangzhou.aliyuncs.com/google_containers/metrics-server:v0.6.4
+
+查看pod是否安装(metrics-server pod是否存在)
+> kubectl get pods -n kube-system
+
+安装好后可以查看cpu、内存使用情况
+> kubectl top pods 
+
