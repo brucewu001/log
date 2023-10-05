@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    kubernetes.io/nginx.class: "nginx" # 他就是这么教我写上来的，有什么用我是一丁点都不指定
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx # 加一条
+  rules: # 规则
+    - host: localhost.com # 域名
+      http:
+        paths:
+          - pathType: Prefix # 前缀匹配额
+            backend:
+              service:
+                name: nginx-svc # 调用得svc名字
+                port:
+                  number: 80 # 调用的端口
+            path: /api # 对应api

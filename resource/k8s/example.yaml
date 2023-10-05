@@ -1,0 +1,34 @@
+apiVersion: v1 # api 文档版本 目前为v1
+kind: Pod # 资源对象类型，例如：Pod、Deployment、StatefulSet 这一类对象等
+metadata: # 用于描述资源对象的元数据
+  name: nginx-demo # 名称
+spec: # 资源规格 资源的各种规格，是期望达到这规格的一些规定
+  containers: # 对应 容器的一些规定
+    - name: nginx # 容器名称
+      image: nginx:1.7.9 # 容器所需要的镜像和版本（需要仓库里面有）
+      imagePullPolicy: IfNotPresent # 拉取策略 镜像拉取策略。"Always"、"Never"、"IfNotPresent" 之一。如果不指定策略并且image指定了 :latest 标签，则默认为 "Always"， 否则默认为 "IfNotPresent"。
+      command: ["/bin/sh", "-c", "env;sleep 3600"]
+      env: # 环境变量
+        - name: JVM_OPTS
+          value: '-Xms128m -Xmx128m'
+        - name: CONFIG_NAME # 环境变量
+          valueFrom:
+            configMapKeyRef:
+              name: literal-config # configmap 名
+              key: name # configmap key
+#      volumeMounts: # 加载数据卷，避免数据丢失
+#        - name: balabala # 数据卷名称
+#          mountPath: /usr/local/mysql/conf/ # 将数据卷挂载到（容器内）的目录
+#          readOnly: true
+
+      volumeMounts: # 加载数据卷，避免数据丢失
+        - name: balabala # 数据卷名称
+          mountPath: etc/nginx/nginx.conf # 将容器内的配置文件挂载到nginx-config 此文件夹将被覆盖 所以需要使用 subPath 方法
+          subPath: etc/nginx/nginx.conf
+  volumes:
+    - name: balabala # 数据卷名称
+      configMap: # 使用configmap的方式来挂载(容器外)
+        name: nginx-config # configmap 名
+        items:
+          - key: "nginx.conf" # 对应的文件名
+            path: "etc/nginx/nginx.conf" # 可以修改为自定义名

@@ -72,6 +72,11 @@ spec: # 资源规格 资源的各种规格，是期望达到这规格的一些�
       env: # 环境变量
         - name: JVM_OPTS
           value: '-Xms128m -Xmx128m'
+        - name: port # 环境变量
+          valueFrom:
+            configMapKeyRef:
+              name: literal-config # configmap 名
+              key: name # configmap key
       resources: # 如其名
         requests: # 规定硬件资源的使用最小值
           cpu: 0.01 # 使用 cpu 百分之一的资源

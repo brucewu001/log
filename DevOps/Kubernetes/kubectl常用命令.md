@@ -132,3 +132,25 @@ master节点下admin.conf记录了最高权限的用户账号，复制到其他�
 安装好后可以查看cpu、内存使用情况
 > kubectl top pods 
 
+查看日志
+> kubectl logs -f pod名
+
+### 创建configmap的4种方式
+1. 目录创建 (test目录下的所有配置文件将加载到dir-config中)
+> kubectl create cm dir-config --from-file=./config/test
+
+2. 配置文件创建(根据对应的配置文件创建file-config)
+> kubectl create cm file-config --from-file=./config/app.yml
+
+3. 配置文件改名创建（根据配置文件修改其名称创建file-alis-config)
+> kubectl create cm file-alis-config --from-file=ggboy.yml=./config/app.yml
+
+4. 命令行参数创建(name=wu, nihao=wohao)
+> kubectl crate cm literal-config --from-literal=name=wu --from-literal=nihao=wohao
+
+
+### configmap使用2种方式
+1. 通过引用方式获取值(参考configmap.yaml)
+![img.png](../../resource/k8s/img3.png)
+2. 通过挂载方式获取值(参考configmap.yaml)
+![img.png](../../resource/k8s/img4.png)
