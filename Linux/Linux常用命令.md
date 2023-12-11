@@ -50,3 +50,17 @@
 
 ### 添加执行权限
 > sudo chmod +x /etc/sysconfig/startup.sh
+
+### base64编码/解码
+1. 编码
+> echo 'supersecret' | base64
+
+2. 解码
+> echo 'c3VwZXJzZWNyZXQK' | base64 --decode
+
+### 简单输出到文件
+1. 覆盖写人文件
+> echo 'dsgzsdga' > index.html
+
+2. 追加写人文件
+> echo 'sadgaeasdg' >> index.html

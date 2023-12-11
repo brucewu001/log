@@ -7,6 +7,8 @@ metadata: # 用于描述资源对象的元数据
     version: 1.0.0 # 标签可以多个
   nameSpace: 'default' # 命名空间，不填就是default
 spec: # 资源规格 资源的各种规格，是期望达到这规格的一些规定
+  imagePullSecrets: # 配置harbor拉取镜像需要信息
+    name: docker-secret # docker-registry secret名称
   terminationGracePeriodSeconds: 40 # pod 删除停留时间默认30秒，这期间状态为terminating
   containers: # 对应 容器的一些规定
     - name: nginx # 容器名称

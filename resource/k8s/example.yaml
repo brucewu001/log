@@ -21,14 +21,23 @@ spec: # 资源规格 资源的各种规格，是期望达到这规格的一些�
 #          mountPath: /usr/local/mysql/conf/ # 将数据卷挂载到（容器内）的目录
 #          readOnly: true
 
+#      volumeMounts: # 加载数据卷，避免数据丢失
+#        - name: balabala # 数据卷名称
+#          mountPath: etc/nginx/nginx.conf
+#          subPath: etc/nginx/nginx.conf # 将容器内的配置文件挂载到nginx-config 此文件夹将被覆盖 所以需要使用 subPath 方法
+#  volumes:
+#    - name: balabala # 数据卷名称
+#      configMap: # 使用configmap的方式来挂载(容器外)
+#        name: nginx-config # configmap 名
+#        items:
+#          - key: "nginx.conf" # 对应的文件名
+#            path: "etc/nginx/nginx.conf" # 可以修改为自定义名
+
       volumeMounts: # 加载数据卷，避免数据丢失
         - name: balabala # 数据卷名称
-          mountPath: etc/nginx/nginx.conf # 将容器内的配置文件挂载到nginx-config 此文件夹将被覆盖 所以需要使用 subPath 方法
-          subPath: etc/nginx/nginx.conf
+          mountPath: /data-test
   volumes:
     - name: balabala # 数据卷名称
-      configMap: # 使用configmap的方式来挂载(容器外)
-        name: nginx-config # configmap 名
-        items:
-          - key: "nginx.conf" # 对应的文件名
-            path: "etc/nginx/nginx.conf" # 可以修改为自定义名
+      hostPath:
+        path: /data-test
+        type: DirectoryOrCreate

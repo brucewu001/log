@@ -1,0 +1,21 @@
+apiVersion: v1 # api 文档版本 目前为v1
+kind: Pod # 资源对象类型，例如：Pod、Deployment、StatefulSet 这一类对象等
+metadata: # 用于描述资源对象的元数据
+  name: emptydir-demo # 名称
+spec: # 资源规格 资源的各种规格，是期望达到这规格的一些规定
+  containers: # 对应 容器的一些规定
+    - name: emptydir1 # 容器名称
+      image: alpine # 容器所需要的镜像和版本（需要仓库里面有）
+      command: [ "/bin/sh", "-c", "sleep 3600"]
+      volumeMounts: # 加载数据卷，避免数据丢失
+        - name: balabala # 数据卷名称
+          mountPath: /d-test
+    - name: emptydir2 # 容器名称
+      image: alpine # 容器所需要的镜像和版本（需要仓库里面有）
+      command: [ "/bin/sh", "-c", "sleep 3600" ]
+      volumeMounts: # 加载数据卷，避免数据丢失
+        - name: balabala # 数据卷名称
+          mountPath: /data-test
+  volumes:
+    - name: balabala # 数据卷名称
+      emptyDir: {} # pod 内容器目录共享 ，不具备持久性，pod删除就没了

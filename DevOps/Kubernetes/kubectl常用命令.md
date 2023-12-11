@@ -154,3 +154,62 @@ master节点下admin.conf记录了最高权限的用户账号，复制到其他�
 ![img.png](../../resource/k8s/img3.png)
 2. 通过挂载方式获取值(参考configmap.yaml)
 ![img.png](../../resource/k8s/img4.png)
+
+### secret 创建
+1. 使用generic方式创建(参数同configmap一样) secret 采用base64编码
+> kubectl create secret generic secret-demo --from-literal=key1=supersecret
+
+2. 使用docker-registry方式创建 (配置本地docker仓库harbor使用)
+> kubectl create secret docker-registry docker-secret --docker-username=user --docker-passw
+ord=password --docker-email=email@163.com --docker-server=127.0.0.1
+![img.png](../../resource/k8s/img.png)
+
+
+### subpath 挂载方式
+因：当使用configmap 或 secret 文件挂载时 挂载的目录有其他文件会将其它文件全部清除只留下configmap的文件或者secret文件
+使用 subpath 只覆盖对应的文件
+![img.png](../../resource/k8s/img999.png)
+
+### 配置文件不可变
+因：在开发测试环境可以修改配置，但是到了生产环境就不希望配置文件变化了
+所：可以在配置添加immutable: true 禁止修改
+1. 编辑cm
+> kubectl edit cm 配置名
+2. 在最外层添加immutable: true
+> immutable: true
+
+### hostpath 容器外节点内文件挂载
+直接亮剑
+![img.png](../../resource/k8s/img25.png)
+
+### pod 内容器目录共享
+参考empty-dir.yaml
+
+### nfs
+nfs（网络文件系统） 实现多台节点通过网络实现文件共享
+1. 安装，多台设备
+> yum install -y nfs-utils
+
+2. 启动，多台设备
+> systemctl start nfs-server
+
+3. 创建共享目录，被共享文件设备
+> mkdir =p /home/nfs/ro
+> mkdir -p /home/nfs/rw
+
+4. 配置共享目录，被共享文件设备
+> vi /etc/exports （添加以下内容）
+/home/nfs/ro 192.168.198.0/24(ro,sync,no_subtree_check,no_root_squash)
+/home/nfs/rw 192.168.198.0/24(rw,sync,no_subtree_check,no_root_squash)
+
+5. 刷新，重启，被共享文件设备
+> exportsfs -f
+> systemctl reload nfs-server
+
+6. 装载，共享文件设备
+> mkdir -p /mnt/nfs/ro
+> mkdir -p /mnt/nfs/rw
+> mount -t nfs 192.168.198.161:/home/nfs/rw /mnt/nfs/rw
+> mount -t nfs 192.168.198.161:/home/nfs/ro /mnt/nfs/ro
+
+共享文件设备和被共享文件设备的文件夹 ro 和 rw 已共享
