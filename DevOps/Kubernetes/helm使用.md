@@ -12,7 +12,7 @@
 > helm version
 
 添加仓库
-> helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginxhelm repo add 
+> helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
 查看仓库
 > helm repo list
@@ -50,3 +50,16 @@ nodeSelector 添加标签: ingress: "true"，用于部署 ingress-controller 到
 
 搜索admission修改enabled
 > enabled: true 改为 false
+
+安装ingress-nginx
+> helm install ./ingress-nginx -n ingress-nginx
+
+### helm 安装provisioner
+> helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+
+> helm install nfs-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+--set image.repository=dyrnq/nfs-subdir-external-provisioner \
+--set nfs.server=192.168.198.161 \
+--set nfs.path=/data/k8s-nfs/nfs-provisioner \
+--set storageClass.name=nfs-sc \
+--set storageClass.provisionerName=k8s-cluster.io/nfs-subdir-external-provisioner

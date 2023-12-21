@@ -162,7 +162,7 @@ master节点下admin.conf记录了最高权限的用户账号，复制到其他�
 2. 使用docker-registry方式创建 (配置本地docker仓库harbor使用)
 > kubectl create secret docker-registry docker-secret --docker-username=user --docker-passw
 ord=password --docker-email=email@163.com --docker-server=127.0.0.1
-![img.png](../../resource/k8s/img.png)
+![img.png](../../resource/k8s/img5.png)
 
 
 ### subpath 挂载方式
@@ -198,18 +198,30 @@ nfs（网络文件系统） 实现多台节点通过网络实现文件共享
 > mkdir -p /home/nfs/rw
 
 4. 配置共享目录，被共享文件设备
-> vi /etc/exports （添加以下内容）
+> vi /etc/exports （添加以下内容）  
 /home/nfs/ro 192.168.198.0/24(ro,sync,no_subtree_check,no_root_squash)
 /home/nfs/rw 192.168.198.0/24(rw,sync,no_subtree_check,no_root_squash)
 
 5. 刷新，重启，被共享文件设备
-> exportsfs -f
+> exportsfs -f  
 > systemctl reload nfs-server
 
 6. 装载，共享文件设备
-> mkdir -p /mnt/nfs/ro
+> mkdir -p /mnt/nfs/ro 
 > mkdir -p /mnt/nfs/rw
 > mount -t nfs 192.168.198.161:/home/nfs/rw /mnt/nfs/rw
 > mount -t nfs 192.168.198.161:/home/nfs/ro /mnt/nfs/ro
 
 共享文件设备和被共享文件设备的文件夹 ro 和 rw 已共享
+
+7. nfs 挂载到pod容器内
+参考 [nfs-demo.yaml](../../resource/k8s/nfs-test.yaml)
+
+### pv-pvc 
+存储抽象
+直接参考[pv-pvc.yaml](../../resource/k8s/pv-pvc.yaml) 不写了哈哈哈
+注：挂载的目录nfs服务端要有
+
+### 配置kube用户
+> export KUBECONFIG=/root/.kube/config
+> chmod g-r /root/.kube/config
