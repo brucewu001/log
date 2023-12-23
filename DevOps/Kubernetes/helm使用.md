@@ -52,7 +52,7 @@ nodeSelector 添加标签: ingress: "true"，用于部署 ingress-controller 到
 > enabled: true 改为 false
 
 安装ingress-nginx
-> helm install ./ingress-nginx -n ingress-nginx
+> helm install ingres-nginx ./ingress-nginx -n ingress-nginx
 
 ### helm 安装provisioner
 > helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
