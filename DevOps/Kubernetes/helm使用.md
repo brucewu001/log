@@ -37,19 +37,20 @@
 > tag: 1.5.2
 
 
-修改 kind 类型为 DaemonSet
+> 修改 kind 类型为 DaemonSet
 
-nodeSelector 添加标签: ingress: "true"，用于部署 ingress-controller 到指定节点
+> 修改 dnsPolicy 的值为 ClusterFirstWithHostNet
 
-修改 dnsPolicy 的值为 ClusterFirstWithHostNet
-
-修改 hostNetwork 的值为 true
+> 修改 hostNetwork 的值为 true
 
 修改type
 > type: loadBalancer 改为 type: ClusterIP
 
 搜索admission修改enabled
 > enabled: true 改为 false
+
+nodeSelector 添加标签: ingress: "true"，用于部署 ingress-controller 到指定节点
+> kubectl label node k8s-node1 ingress=true
 
 安装ingress-nginx
 > helm install ingres-nginx ./ingress-nginx -n ingress-nginx

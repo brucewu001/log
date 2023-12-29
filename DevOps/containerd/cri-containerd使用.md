@@ -12,3 +12,6 @@ crictl：Kubernetes的CRI客户端。由于containerd实现了对CRI（Container
 
 查看容器日志
 > crictl logs 容器id
+
+修改tag (现在crictl还不支持修改，但是containerd自己的命令行工具ctr支持，但是k8s的镜像都是在命名空间为k8s.io里的所以需要拉取)
+> ctr image tag xxx xxx
