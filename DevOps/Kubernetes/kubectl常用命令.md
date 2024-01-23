@@ -217,6 +217,20 @@ nfs（网络文件系统） 实现多台节点通过网络实现文件共享
 7. nfs 挂载到pod容器内
 参考 [nfs-demo.yaml](../../resource/k8s/nfs-test.yaml)
 
+8. nfs制作制备器(选择nfs服务器搭建)
+
+```shell
+# 创建这个目录
+mkdir -p /data/nfs/dynamic-provisioner
+# 执行这行命令将这个目录写到写到 /etc/exports 文件当中去，这样NFS会对局域网暴露这个目录
+cat >> /etc/exports << EOF
+/data/nfs/dynamic-provisioner *(rw,sync,no_root_squash)
+EOF
+
+# 去其他节点检查是否暴露成功：
+showmount -e {nfs服务器地址}
+
+```
 ### pv-pvc 
 存储抽象
 直接参考[pv-pvc.yaml](../../resource/k8s/pv-pvc.yaml) 不写了哈哈哈
@@ -225,3 +239,27 @@ nfs（网络文件系统） 实现多台节点通过网络实现文件共享
 ### 配置kube用户
 > export KUBECONFIG=/root/.kube/config
 > chmod g-r /root/.kube/config
+
+### 设置storageClass是为默认
+> kubectl patch storageclass rook-ceph-block -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+
+
+### 更换源
+> gcr.io------>替换为 gcr.dockerproxy.com
+> registry.k8s.io------>替换为 k8s.mirror.nju.edu.cn
+
+
+### 查看jenkins默认密码
+> kubectl get secret --namespace jenkins jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 --decode
+
+### 创建oci仓库配置secret
+> kubectl create secret docker-registry oci-config --docker-username=982469065@qq.com --docker-password=fdsajkl; --docker-server=registry.cn-hangzhou.aliyuncs.com -n jenkins
+
+### containerd使用kaniko构建和推送镜像 
+ctr -n default run --rm --net-host --env DOCKERHUB=docker.io \
+--mount type=bind,src=~/kaniko/config,dst=/kaniko/.docker,options=rbind:ro \
+--mount type=bind,src=~/kaniko/demo,dst=/workspace,options=rbind:rw \
+gcr.dockerproxy.com/kaniko-project/executor:debug kaniko-executor \
+/kaniko/executor --dockerfile=/workspace/Dockerfile --context=dir://workspace \
+--destination=registry.cn-hangzhou.aliyuncs.com/brucewu/hello-kaniko:1.999

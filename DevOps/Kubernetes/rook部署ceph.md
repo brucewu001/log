@@ -21,7 +21,7 @@ sdb
 ```
 
 ```shell
-#Ceph 存储需要包含了 RBD 模块的 Linux 内核来支持。在使用 Kubernetes 环境中运行 Ceph 存储之前，需要在 Kubernetes 节点上运行 modprobe rbd 命令来测试当前内核中是否已经加载了 RBD 内核。
+#Ceph 存储需要包含了 RBD 模块的 OS.Linux 内核来支持。在使用 Kubernetes 环境中运行 Ceph 存储之前，需要在 Kubernetes 节点上运行 modprobe rbd 命令来测试当前内核中是否已经加载了 RBD 内核。
 #查看内核有没有加载rbd模块
 #如下所示代表已加载
 lsmod | grep rbd
